@@ -1,3 +1,5 @@
+![image](https://github.com/Ygnas/kuadrant-plugin/assets/6040758/74134fe4-020f-4a5e-a39b-951f0e797480)
+
 # OpenShift Console Plugin Template
 
 This project is a minimal template for writing a new OpenShift Console dynamic
