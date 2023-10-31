@@ -5,3 +5,7 @@
    * https://patternfly-react-main.surge.sh/developer-resources/global-css-variables */
   color: var(--pf-global--palette--blue-400);
 }
+
+:root {
+  --pf-v5-chart-global--label--Fill: #ffffff; /* Donut label */
+}
