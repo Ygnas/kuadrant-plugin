@@ -16,14 +16,14 @@ import {
   useListPageFilter,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { useHistory } from 'react-router-dom';
-import { CustomizationResource } from '../kuadrant/types';
+import { CustomResource, CustomizationResource } from '../kuadrant/types';
 import { referenceFor } from '../kuadrant/resources';
 import './example.css';
 import CardProp from './ChartProp';
 
 // Define the resources to be displayed in the table
 // Add each resource to the list with its group, version, and kind
-const resources = [
+const resources: CustomResource[] = [
   {
     group: 'kuadrant.io',
     version: 'v1alpha1',
@@ -34,6 +34,11 @@ const resources = [
     version: 'v1beta1',
     kind: 'HTTPRoute',
   },
+  {
+    version: 'v1',
+    kind: 'Deployment',
+    namespace: 'kuadrant-system'
+  }
 ];
 
 
@@ -153,12 +158,13 @@ const CustomizationTable = ({ data, unfilteredData, loaded, loadError }: Customi
 
 const CustomizationList = () => {
   const history = useHistory();
-  const watches = resources.map(({ group, version, kind }) => {
+  const watches = resources.map(({ group, version, kind, namespace }) => {
     // Fetch data, loaded status, and potential error for each resource
     const [data, loaded, error] = useK8sWatchResource<CustomizationResource[]>({
       groupVersionKind: { group, version, kind },
       isList: true,
-      namespaced: false,
+      namespaced: true,
+      namespace: namespace
     });
     if (error) {
       console.error('Could not load', kind, error);

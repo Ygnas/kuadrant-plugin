@@ -10,3 +10,10 @@ export type CustomizationResource = {
     };
   };
 } & K8sResourceCommon;
+
+export type CustomResource = {
+  group?: string;
+  version: string;
+  kind: string;
+  namespace?: string;
+};
