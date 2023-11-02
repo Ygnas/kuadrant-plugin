@@ -19,7 +19,8 @@ import { useHistory } from 'react-router-dom';
 import { CustomResource, CustomizationResource } from '../kuadrant/types';
 import { referenceFor } from '../kuadrant/resources';
 import './example.css';
-import CardProp from './ChartProp';
+import CardGridComponent from './CardGridComponent';
+import DonutChart from './DonutChart';
 
 // Define the resources to be displayed in the table
 // Add each resource to the list with its group, version, and kind
@@ -36,8 +37,8 @@ const resources: CustomResource[] = [
   },
   {
     version: 'v1',
-    kind: 'Deployment',
-    namespace: 'kuadrant-system'
+    kind: 'Pod',
+    namespace: 'default'
   }
 ];
 
@@ -100,15 +101,15 @@ const Row = ({ obj, activeColumnIDs }: RowProps<CustomizationResource>) => {
         {targetReference ? `${targetReference.kind} / ${targetReference.name}` : '-'}
       </TableData>
       <TableData id={columns[3].id} activeColumnIDs={activeColumnIDs}>
-      {resourceKind === 'TLSPolicy' ? (
-    // Links back to grafana dashboard
-    <a href={`https://grafana-monitoring.apps.stitchpoc2.vtdv.p1.openshiftapps.com/d/gatewayapihttproutes/gateway-api-state-${resourceKind}`}>{resourceKind}</a>
-  ) : resourceKind === 'HTTPRoute' ? (
-    // Links back to grafana dashboard
-    <a href={`https://grafana-monitoring.apps.stitchpoc2.vtdv.p1.openshiftapps.com/d/gatewayapihttproutes/gateway-api-state-${resourceKind}s`}>{resourceKind}</a>
-  ) : (
-    '-'
-  )}
+        {resourceKind === 'TLSPolicy' ? (
+          // Links back to grafana dashboard
+          <a href={`https://grafana-monitoring.apps.stitchpoc2.vtdv.p1.openshiftapps.com/d/gatewayapihttproutes/gateway-api-state-${resourceKind}`}>{resourceKind}</a>
+        ) : resourceKind === 'HTTPRoute' ? (
+          // Links back to grafana dashboard
+          <a href={`https://grafana-monitoring.apps.stitchpoc2.vtdv.p1.openshiftapps.com/d/gatewayapihttproutes/gateway-api-state-${resourceKind}s`}>{resourceKind}</a>
+        ) : (
+          '-'
+        )}
       </TableData>
     </>
   );
@@ -158,6 +159,7 @@ const CustomizationTable = ({ data, unfilteredData, loaded, loadError }: Customi
 
 const CustomizationList = () => {
   const history = useHistory();
+  const [selectedDataPoint, setSelectedDataPoint] = React.useState(null);
   const watches = resources.map(({ group, version, kind, namespace }) => {
     // Fetch data, loaded status, and potential error for each resource
     const [data, loaded, error] = useK8sWatchResource<CustomizationResource[]>({
@@ -191,6 +193,10 @@ const CustomizationList = () => {
     history.push(path);
   };
 
+  const onDataPointSelect = (dataPoint) => {
+    setSelectedDataPoint(dataPoint);
+  };
+
   return (
     <>
       {/* List page header */}
@@ -208,7 +214,9 @@ const CustomizationList = () => {
           rowFilters={filters}
           onFilterChange={onFilterChange}
         />
-        <CardProp data={filteredData}/>
+        <CardGridComponent chartComponent={<DonutChart data={filteredData}
+          onDataPointSelect={onDataPointSelect} />}
+          selectedDataPoint={selectedDataPoint} />
         {/* Display the customized table with data */}
         <CustomizationTable
           data={filteredData}
